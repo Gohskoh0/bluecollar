@@ -13,11 +13,33 @@ export const getPaystackPublicKey = createServerFn({ method: "GET" }).handler(as
 // Initialize an inline transaction: creates a pending row and returns a reference + email.
 // We use Paystack Inline (popup) on the client, so this server fn only registers the
 // pending transaction. Verification happens in /verify or via webhook.
+// Plans allowed per user_type — recruiters/companies cannot subscribe to professional plans, and vice versa.
+const PRO_USER_PLANS = new Set(["pro", "expert"]);
+const RECRUITER_PLANS = new Set(["recruiter_pro", "recruiter_expert"]);
+
 export const initializePaystack = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { plan: string }) => ({ plan: PlanSchema.parse(d.plan) }))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+
+    // Enforce plan ↔ user_type segregation on the server.
+    const { data: profile, error: pErr } = await supabase
+      .from("profiles")
+      .select("user_type")
+      .eq("id", userId)
+      .maybeSingle();
+    if (pErr || !profile) throw new Error("Profile not found");
+
+    const isProfessional = profile.user_type === "professional";
+    const isRecruiterOrCompany = profile.user_type === "recruiter" || profile.user_type === "company";
+    if (isProfessional && !PRO_USER_PLANS.has(data.plan)) {
+      throw new Error("This plan is not available for professional accounts.");
+    }
+    if (isRecruiterOrCompany && !RECRUITER_PLANS.has(data.plan)) {
+      throw new Error("This plan is not available for recruiter/company accounts.");
+    }
+
     const amountKobo = PLAN_PRICE_NGN[data.plan] * 100;
     const reference = `bc_${userId.slice(0, 8)}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 

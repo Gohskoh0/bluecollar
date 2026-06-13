@@ -13,11 +13,7 @@ import logo from "@/assets/bluecollar-logo.png";
 const searchSchema = z.object({ mode: z.enum(["signin", "signup"]).optional() });
 
 function getAuthRedirectUrl() {
-  const origin = window.location.origin;
-  if (origin.includes("localhost") || origin.includes("127.0.0.1")) {
-    return "https://id-preview--672d734d-9f05-4b92-8954-f55410e25215.lovable.app/feed";
-  }
-  return `${origin}/feed`;
+  return `${window.location.origin}/feed`;
 }
 
 export const Route = createFileRoute("/auth")({
@@ -71,7 +67,29 @@ function AuthPage() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      const msg = error.message.toLowerCase();
+      if (msg.includes("email not confirmed") || msg.includes("not confirmed")) {
+        return toast.error("Please verify your email first.", {
+          action: {
+            label: "Resend",
+            onClick: async () => {
+              const { error: rErr } = await supabase.auth.resend({
+                type: "signup",
+                email,
+                options: { emailRedirectTo: getAuthRedirectUrl() },
+              });
+              if (rErr) toast.error(rErr.message);
+              else toast.success("Verification email sent.");
+            },
+          },
+        });
+      }
+      if (msg.includes("invalid login") || msg.includes("invalid credentials")) {
+        return toast.error("Incorrect email or password.");
+      }
+      return toast.error(error.message);
+    }
     navigate({ to: "/feed" });
   }
 
