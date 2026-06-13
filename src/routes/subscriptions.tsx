@@ -120,22 +120,35 @@ function SubsPage() {
     );
   }
 
+  const isProfessional = profile?.user_type === "professional";
+  const isRecruiterOrCompany = profile?.user_type === "recruiter" || profile?.user_type === "company";
+
   return (
     <div className="space-y-8">
       <div className="text-center">
         <h1 className="text-3xl font-bold">Choose your plan</h1>
-        <p className="mt-2 text-muted-foreground">Secure checkout — payment runs in-app, no redirects.</p>
+        <p className="mt-2 text-muted-foreground">Secure checkout via Paystack — payment runs in-app, no redirects.</p>
       </div>
 
-      <section>
-        <h2 className="mb-4 text-lg font-semibold">For Professionals</h2>
-        <div className="grid gap-4 md:grid-cols-3">{PRO_PLANS.map((p) => <PlanCard key={p.id} p={p} />)}</div>
-      </section>
+      {isProfessional && (
+        <section>
+          <h2 className="mb-4 text-lg font-semibold">Plans for Professionals</h2>
+          <div className="grid gap-4 md:grid-cols-3">{PRO_PLANS.map((p) => <PlanCard key={p.id} p={p} />)}</div>
+        </section>
+      )}
 
-      <section>
-        <h2 className="mb-4 text-lg font-semibold">For Recruiters & Companies</h2>
-        <div className="grid gap-4 md:grid-cols-2">{REC_PLANS.map((p) => <PlanCard key={p.id} p={p} />)}</div>
-      </section>
+      {isRecruiterOrCompany && (
+        <section>
+          <h2 className="mb-4 text-lg font-semibold">
+            Plans for {profile?.user_type === "company" ? "Companies" : "Recruiters"}
+          </h2>
+          <div className="grid gap-4 md:grid-cols-2">{REC_PLANS.map((p) => <PlanCard key={p.id} p={p} />)}</div>
+        </section>
+      )}
+
+      {!profile && (
+        <p className="text-center text-sm text-muted-foreground">Sign in to view plans available to your account type.</p>
+      )}
 
       <p className="text-center text-xs text-muted-foreground">
         Subscription revenue funds the SONA reward pools — no inflation, only redistribution.
