@@ -1,0 +1,16 @@
+
+CREATE POLICY "Profile files are publicly readable"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'profiles');
+
+CREATE POLICY "Users upload own profile files"
+ON storage.objects FOR INSERT TO authenticated
+WITH CHECK (bucket_id = 'profiles' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+CREATE POLICY "Users update own profile files"
+ON storage.objects FOR UPDATE TO authenticated
+USING (bucket_id = 'profiles' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+CREATE POLICY "Users delete own profile files"
+ON storage.objects FOR DELETE TO authenticated
+USING (bucket_id = 'profiles' AND (storage.foldername(name))[1] = auth.uid()::text);
