@@ -94,6 +94,17 @@ function AuthPage() {
     navigate({ to: "/feed" });
   }
 
+  async function handleGoogle() {
+    setLoading(true);
+    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/feed` });
+    if (result.error) {
+      setLoading(false);
+      return toast.error(result.error.message || "Google sign-in failed");
+    }
+    if (result.redirected) return;
+    navigate({ to: "/feed" });
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-accent via-background to-background px-4 py-10">
       <div className="w-full max-w-md">
