@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import logo from "@/assets/bluecollar-logo.png";
 
 const searchSchema = z.object({ mode: z.enum(["signin", "signup"]).optional() });
