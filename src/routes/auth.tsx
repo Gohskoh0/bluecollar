@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import logo from "@/assets/bluecollar-logo.png";
 
 const searchSchema = z.object({ mode: z.enum(["signin", "signup"]).optional() });
@@ -93,6 +94,17 @@ function AuthPage() {
     navigate({ to: "/feed" });
   }
 
+  async function handleGoogle() {
+    setLoading(true);
+    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/feed` });
+    if (result.error) {
+      setLoading(false);
+      return toast.error(result.error.message || "Google sign-in failed");
+    }
+    if (result.redirected) return;
+    navigate({ to: "/feed" });
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-accent via-background to-background px-4 py-10">
       <div className="w-full max-w-md">
@@ -108,7 +120,16 @@ function AuthPage() {
               <TabsTrigger value="signup">Create account</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="signin" className="mt-5">
+            <div className="mt-5">
+              <Button type="button" variant="outline" className="w-full" onClick={handleGoogle} disabled={loading}>
+                Continue with Google
+              </Button>
+              <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
+                <div className="h-px flex-1 bg-border" /> or <div className="h-px flex-1 bg-border" />
+              </div>
+            </div>
+
+            <TabsContent value="signin" className="mt-0">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div>
                   <Label htmlFor="si-email">Email</Label>
