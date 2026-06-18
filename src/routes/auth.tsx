@@ -120,8 +120,22 @@ function AuthPage() {
               <TabsTrigger value="signup">Create account</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="signin" className="mt-5">
-              <form onSubmit={handleSignIn} className="space-y-4">
+          <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="signin">Sign in</TabsTrigger>
+              <TabsTrigger value="signup">Create account</TabsTrigger>
+            </TabsList>
+
+            <div className="mt-5">
+              <Button type="button" variant="outline" className="w-full" onClick={handleGoogle} disabled={loading}>
+                Continue with Google
+              </Button>
+              <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
+                <div className="h-px flex-1 bg-border" /> or <div className="h-px flex-1 bg-border" />
+              </div>
+            </div>
+
+            <TabsContent value="signin" className="mt-0">
                 <div>
                   <Label htmlFor="si-email">Email</Label>
                   <Input id="si-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
