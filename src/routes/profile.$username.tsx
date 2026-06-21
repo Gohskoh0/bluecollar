@@ -19,6 +19,7 @@ import { initials } from "@/lib/utils";
 import { PhotoUploader } from "@/components/profile/AvatarUploader";
 import { MonetizationTab } from "@/components/profile/MonetizationTab";
 import { getFeatures, PLAN_LABEL } from "@/lib/feature-gates";
+import { isVideoMedia, resolvePostMedia, resolveProfileMedia } from "@/lib/storage-media";
 
 export const Route = createFileRoute("/profile/$username")({
   head: ({ params }) => ({ meta: [{ title: `@${params.username} · BlueCollar` }, { name: "description", content: `Profile of @${params.username} on BlueCollar.` }] }),
@@ -38,10 +39,11 @@ function ProfilePage() {
 
   async function load() {
     const { data } = await supabase.from("profiles").select("*").eq("username", username).maybeSingle();
-    setP(data); if (!data) return;
+    const resolvedProfile = data ? await resolveProfileMedia(data) : null;
+    setP(resolvedProfile); if (!resolvedProfile) return;
     setHeadline(data.headline ?? ""); setBio(data.bio ?? ""); setLoc(data.location ?? ""); setSkills((data.skills ?? []).join(", "));
     const { data: ps } = await supabase.from("posts").select("*").eq("author_id", data.id).order("created_at", { ascending: false }).limit(20);
-    setPosts(ps ?? []);
+    setPosts(await Promise.all((ps ?? []).map((post) => resolvePostMedia(post))));
     if (user && user.id !== data.id) {
       const { data: f } = await supabase.from("follows").select("follower_id").eq("follower_id", user.id).eq("following_id", data.id).maybeSingle();
       setFollowing(!!f);
@@ -151,6 +153,15 @@ function ProfilePage() {
                 {posts.map((post) => (
                   <div key={post.id} className="rounded-lg border border-border p-3">
                     <p className="text-sm whitespace-pre-wrap">{post.content}</p>
+                    {post.image_url && (
+                      <div className="mt-3 overflow-hidden rounded-lg border border-border">
+                        {isVideoMedia(post.image_url) ? (
+                          <video src={post.image_url} className="max-h-[360px] w-full object-contain" controls preload="metadata" />
+                        ) : (
+                          <img src={post.image_url} alt="Post media" className="max-h-[360px] w-full object-contain" loading="lazy" />
+                        )}
+                      </div>
+                    )}
                     <div className="mt-2 text-xs text-muted-foreground">{post.like_count} likes · {post.comment_count} comments</div>
                   </div>
                 ))}
