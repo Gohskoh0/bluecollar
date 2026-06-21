@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth, type Profile } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { ACTION_WEIGHTS, formatRelative, initials } from "@/lib/utils";
+import { isVideoMedia, resolvePostMedia, resolveProfileMedia, toStorageRef } from "@/lib/storage-media";
 
 export const Route = createFileRoute("/feed")({
   head: () => ({ meta: [{ title: "Feed · BlueCollar" }, { name: "description", content: "Your professional feed on BlueCollar." }] }),
@@ -52,12 +53,18 @@ function FeedPage() {
       const { data: likes } = await supabase.from("likes").select("post_id").eq("user_id", user.id);
       likedSet = new Set((likes ?? []).map((l) => l.post_id));
     }
-    setPosts((postData as any[]).map((p) => ({ ...p, liked: likedSet.has(p.id) })));
+    const resolvedPosts = await Promise.all((postData as any[]).map(async (p) => ({
+      ...(await resolvePostMedia(p)),
+      author: await resolveProfileMedia(p.author),
+      liked: likedSet.has(p.id),
+    })));
+    setPosts(resolvedPosts);
   }
 
   function pickMedia(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     if (!f) return;
+    if (!f.type.startsWith("image/") && !f.type.startsWith("video/")) return toast.error("Choose an image or video");
     if (f.size > 10 * 1024 * 1024) return toast.error("Max 10MB");
     setMediaFile(f);
     setMediaPreview(URL.createObjectURL(f));
@@ -79,9 +86,7 @@ function FeedPage() {
       const path = `${user.id}/${Date.now()}.${ext}`;
       const { error: upErr } = await supabase.storage.from("post-media").upload(path, mediaFile, { contentType: mediaFile.type, upsert: false });
       if (upErr) { setPosting(false); return toast.error(upErr.message); }
-      const { data: signed, error: sErr } = await supabase.storage.from("post-media").createSignedUrl(path, 60 * 60 * 24 * 365);
-      if (sErr || !signed) { setPosting(false); return toast.error(sErr?.message ?? "Sign failed"); }
-      imageUrl = signed.signedUrl;
+      imageUrl = toStorageRef("post-media", path);
     }
     const { error } = await supabase.from("posts").insert({ author_id: user.id, content: composer.trim(), image_url: imageUrl });
     setPosting(false);
@@ -137,10 +142,25 @@ function FeedPage() {
             </Avatar>
             <div className="flex-1">
               <Textarea value={composer} onChange={(e) => setComposer(e.target.value)} placeholder="Share an insight, experience, or update…" className="min-h-[80px] resize-none border-0 bg-muted/40 focus-visible:ring-1" />
+              <input ref={mediaInputRef} type="file" accept="image/*,video/*" hidden onChange={pickMedia} />
+              {mediaPreview && (
+                <div className="relative mt-3 overflow-hidden rounded-lg border border-border bg-muted/40">
+                  {mediaFile?.type.startsWith("video/") ? (
+                    <video src={mediaPreview} className="max-h-[360px] w-full object-contain" controls />
+                  ) : (
+                    <img src={mediaPreview} alt="Selected media preview" className="max-h-[360px] w-full object-contain" />
+                  )}
+                  <Button type="button" variant="secondary" size="icon" className="absolute right-2 top-2 h-8 w-8" onClick={clearMedia} aria-label="Remove media">
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
               <div className="mt-2 flex items-center justify-between">
-                <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground"><ImagePlus className="h-4 w-4" /> Media</Button>
-                <Button onClick={publish} disabled={!composer.trim() || posting} size="sm" className="gap-2">
-                  <Send className="h-4 w-4" /> {posting ? "Posting…" : "Post"}
+                <Button type="button" variant="ghost" size="sm" className="gap-2 text-muted-foreground" onClick={() => mediaInputRef.current?.click()}>
+                  <ImagePlus className="h-4 w-4" /> Media
+                </Button>
+                <Button onClick={publish} disabled={(!composer.trim() && !mediaFile) || posting} size="sm" className="gap-2">
+                  {posting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} {posting ? "Posting…" : "Post"}
                 </Button>
               </div>
             </div>
@@ -171,7 +191,11 @@ function FeedPage() {
             <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">{p.content}</p>
             {p.image_url && (
               <div className="mt-3 overflow-hidden rounded-lg border border-border">
-                <img src={p.image_url} alt="" className="max-h-[480px] w-full object-cover" loading="lazy" />
+                {isVideoMedia(p.image_url) ? (
+                  <video src={p.image_url} className="max-h-[480px] w-full object-contain" controls preload="metadata" />
+                ) : (
+                  <img src={p.image_url} alt="Post media" className="max-h-[480px] w-full object-contain" loading="lazy" />
+                )}
               </div>
             )}
             <div className="mt-3 flex items-center justify-between border-t border-border pt-2 text-sm">
