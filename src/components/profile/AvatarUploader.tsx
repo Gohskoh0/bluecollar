@@ -42,18 +42,20 @@ export function PhotoUploader({ userId, kind, onUploaded, className = "", label 
     onUploaded(signed.signedUrl);
   }
 
+  const iconOnly = label === "";
   return (
     <>
       <input ref={inputRef} type="file" accept="image/*" hidden onChange={handleFile} />
       <Button
-        size="sm"
+        size={iconOnly ? "icon" : "sm"}
         variant="secondary"
-        className={`gap-2 shadow-md ${className}`}
+        className={`${iconOnly ? "h-8 w-8 rounded-full p-0" : "gap-2"} shadow-md ${className}`}
         onClick={() => inputRef.current?.click()}
         disabled={busy}
+        aria-label={kind === "avatar" ? "Edit photo" : "Edit cover"}
       >
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
-        {label ?? (kind === "avatar" ? "Edit photo" : "Edit cover")}
+        {!iconOnly && (label ?? (kind === "avatar" ? "Edit photo" : "Edit cover"))}
       </Button>
     </>
   );
