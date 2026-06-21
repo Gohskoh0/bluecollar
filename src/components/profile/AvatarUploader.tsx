@@ -3,6 +3,7 @@ import { Camera, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { resolveStorageUrl, toStorageRef } from "@/lib/storage-media";
 
 interface Props {
   userId: string;
@@ -32,14 +33,13 @@ export function PhotoUploader({ userId, kind, onUploaded, className = "", label 
       setBusy(false);
       return toast.error(error.message);
     }
-    const { data: signed, error: signErr } = await supabase.storage.from("profiles").createSignedUrl(path, 60 * 60 * 24 * 365);
-    if (signErr || !signed) { setBusy(false); return toast.error(signErr?.message ?? "Sign failed"); }
-    const update = kind === "avatar" ? { avatar_url: signed.signedUrl } : { cover_url: signed.signedUrl };
+    const mediaRef = toStorageRef("profiles", path);
+    const update = kind === "avatar" ? { avatar_url: mediaRef } : { cover_url: mediaRef };
     const { error: upErr } = await supabase.from("profiles").update(update).eq("id", userId);
     setBusy(false);
     if (upErr) return toast.error(upErr.message);
     toast.success("Photo updated");
-    onUploaded(signed.signedUrl);
+    onUploaded((await resolveStorageUrl("profiles", mediaRef)) ?? mediaRef);
   }
 
   const iconOnly = label === "";
