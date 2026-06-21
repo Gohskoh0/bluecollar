@@ -32,13 +32,14 @@ export function PhotoUploader({ userId, kind, onUploaded, className = "", label 
       setBusy(false);
       return toast.error(error.message);
     }
-    const { data: pub } = supabase.storage.from("profiles").getPublicUrl(path);
-    const update = kind === "avatar" ? { avatar_url: pub.publicUrl } : { cover_url: pub.publicUrl };
+    const { data: signed, error: signErr } = await supabase.storage.from("profiles").createSignedUrl(path, 60 * 60 * 24 * 365);
+    if (signErr || !signed) { setBusy(false); return toast.error(signErr?.message ?? "Sign failed"); }
+    const update = kind === "avatar" ? { avatar_url: signed.signedUrl } : { cover_url: signed.signedUrl };
     const { error: upErr } = await supabase.from("profiles").update(update).eq("id", userId);
     setBusy(false);
     if (upErr) return toast.error(upErr.message);
     toast.success("Photo updated");
-    onUploaded(pub.publicUrl);
+    onUploaded(signed.signedUrl);
   }
 
   return (
