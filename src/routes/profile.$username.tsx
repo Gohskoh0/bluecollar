@@ -39,8 +39,9 @@ function ProfilePage() {
 
   async function load() {
     const { data } = await supabase.from("profiles").select("*").eq("username", username).maybeSingle();
+    if (!data) { setP(null); return; }
     const resolvedProfile = data ? await resolveProfileMedia(data) : null;
-    setP(resolvedProfile); if (!resolvedProfile) return;
+    setP(resolvedProfile);
     setHeadline(data.headline ?? ""); setBio(data.bio ?? ""); setLoc(data.location ?? ""); setSkills((data.skills ?? []).join(", "));
     const { data: ps } = await supabase.from("posts").select("*").eq("author_id", data.id).order("created_at", { ascending: false }).limit(20);
     setPosts(await Promise.all((ps ?? []).map((post) => resolvePostMedia(post))));
