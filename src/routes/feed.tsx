@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Heart, MessageCircle, Share2, Send, ImagePlus } from "lucide-react";
+import { Heart, MessageCircle, Share2, Send, ImagePlus, X, Loader2 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,9 @@ function FeedPage() {
   const [posts, setPosts] = useState<PostRow[]>([]);
   const [composer, setComposer] = useState("");
   const [posting, setPosting] = useState(false);
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
+  const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+  const mediaInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { loadFeed(); }, [user?.id]);
 
@@ -52,13 +55,39 @@ function FeedPage() {
     setPosts((postData as any[]).map((p) => ({ ...p, liked: likedSet.has(p.id) })));
   }
 
+  function pickMedia(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (f.size > 10 * 1024 * 1024) return toast.error("Max 10MB");
+    setMediaFile(f);
+    setMediaPreview(URL.createObjectURL(f));
+  }
+
+  function clearMedia() {
+    setMediaFile(null);
+    if (mediaPreview) URL.revokeObjectURL(mediaPreview);
+    setMediaPreview(null);
+    if (mediaInputRef.current) mediaInputRef.current.value = "";
+  }
+
   async function publish() {
-    if (!composer.trim() || !user) return;
+    if ((!composer.trim() && !mediaFile) || !user) return;
     setPosting(true);
-    const { error } = await supabase.from("posts").insert({ author_id: user.id, content: composer.trim() });
+    let imageUrl: string | null = null;
+    if (mediaFile) {
+      const ext = mediaFile.name.split(".").pop() || "jpg";
+      const path = `${user.id}/${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("post-media").upload(path, mediaFile, { contentType: mediaFile.type, upsert: false });
+      if (upErr) { setPosting(false); return toast.error(upErr.message); }
+      const { data: signed, error: sErr } = await supabase.storage.from("post-media").createSignedUrl(path, 60 * 60 * 24 * 365);
+      if (sErr || !signed) { setPosting(false); return toast.error(sErr?.message ?? "Sign failed"); }
+      imageUrl = signed.signedUrl;
+    }
+    const { error } = await supabase.from("posts").insert({ author_id: user.id, content: composer.trim(), image_url: imageUrl });
     setPosting(false);
     if (error) return toast.error(error.message);
     setComposer("");
+    clearMedia();
     toast.success("Post published");
     loadFeed();
   }
@@ -140,6 +169,11 @@ function FeedPage() {
               </div>
             </div>
             <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">{p.content}</p>
+            {p.image_url && (
+              <div className="mt-3 overflow-hidden rounded-lg border border-border">
+                <img src={p.image_url} alt="" className="max-h-[480px] w-full object-cover" loading="lazy" />
+              </div>
+            )}
             <div className="mt-3 flex items-center justify-between border-t border-border pt-2 text-sm">
               <div className="text-xs text-muted-foreground">{p.like_count} likes · {p.comment_count} comments</div>
             </div>
