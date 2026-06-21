@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { resolveProfileMedia } from "@/lib/storage-media";
 
 export interface Profile {
   id: string;
@@ -53,7 +54,7 @@ export function useAuth() {
 
   async function loadProfile(userId: string) {
     const { data } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
-    if (data) setProfile(data as Profile);
+    if (data) setProfile(await resolveProfileMedia(data as Profile));
   }
 
   async function signOut() {
