@@ -59,7 +59,7 @@ function JobsPage() {
     if (!user) return;
     const { error } = await supabase.from("applications").insert({ job_id: jobId, applicant_id: user.id });
     if (error) return toast.error(error.message.includes("duplicate") ? "Already applied" : error.message);
-    await supabase.from("reward_events").insert({ user_id: user.id, action: "job_application", weight: ACTION_WEIGHTS.job_application.weight, pool: "hiring" });
+    // reward event auto-created server-side by trigger
     toast.success("Application submitted");
     load();
   }

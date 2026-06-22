@@ -38,7 +38,8 @@ function ProfilePage() {
   useEffect(() => { load(); }, [username, user?.id]);
 
   async function load() {
-    const { data } = await supabase.from("profiles").select("*").eq("username", username).maybeSingle();
+    const source = user ? "profiles" : ("profiles_public" as "profiles");
+    const { data } = await supabase.from(source).select("*").eq("username", username).maybeSingle();
     if (!data) { setP(null); return; }
     const resolvedProfile = data ? await resolveProfileMedia(data) : null;
     setP(resolvedProfile);
