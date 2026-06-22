@@ -20,7 +20,8 @@ export const Route = createFileRoute("/companies")({
 });
 
 function CompaniesPage() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const canCreate = !!profile && profile.user_type !== "professional";
   const [companies, setCompanies] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(""); const [tagline, setTagline] = useState("");
@@ -37,6 +38,7 @@ function CompaniesPage() {
   async function createCompany(e: React.FormEvent) {
     e.preventDefault();
     if (!user) return;
+    if (!canCreate) return toast.error("Only employer/company accounts can create a company page.");
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + Math.random().toString(36).slice(2, 6);
     const { error } = await supabase.from("companies").insert({
       owner_id: user.id, name, slug, tagline, description: desc, industry, growth_pool_goal: goal ? Number(goal) : 0,
@@ -63,21 +65,36 @@ function CompaniesPage() {
           <h1 className="text-2xl font-bold">Companies</h1>
           <p className="text-sm text-muted-foreground">Support companies via no-equity Growth Pools.</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild><Button className="gap-2"><Plus className="h-4 w-4" /> Create company</Button></DialogTrigger>
-          <DialogContent>
-            <DialogHeader><DialogTitle>Create company page</DialogTitle></DialogHeader>
-            <form onSubmit={createCompany} className="space-y-3">
-              <div><Label>Name</Label><Input value={name} onChange={(e)=>setName(e.target.value)} required /></div>
-              <div><Label>Tagline</Label><Input value={tagline} onChange={(e)=>setTagline(e.target.value)} /></div>
-              <div><Label>Industry</Label><Input value={industry} onChange={(e)=>setIndustry(e.target.value)} placeholder="SaaS, Fintech…" /></div>
-              <div><Label>Description</Label><Textarea value={desc} onChange={(e)=>setDesc(e.target.value)} rows={4} /></div>
-              <div><Label>Growth Pool goal (SONA)</Label><Input type="number" value={goal} onChange={(e)=>setGoal(e.target.value)} placeholder="100000" /></div>
-              <Button type="submit" className="w-full">Create</Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+        {canCreate ? (
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild><Button className="gap-2"><Plus className="h-4 w-4" /> Create company</Button></DialogTrigger>
+            <DialogContent>
+              <DialogHeader><DialogTitle>Create company page</DialogTitle></DialogHeader>
+              <form onSubmit={createCompany} className="space-y-3">
+                <div><Label>Name</Label><Input value={name} onChange={(e)=>setName(e.target.value)} required /></div>
+                <div><Label>Tagline</Label><Input value={tagline} onChange={(e)=>setTagline(e.target.value)} /></div>
+                <div><Label>Industry</Label><Input value={industry} onChange={(e)=>setIndustry(e.target.value)} placeholder="SaaS, Fintech…" /></div>
+                <div><Label>Description</Label><Textarea value={desc} onChange={(e)=>setDesc(e.target.value)} rows={4} /></div>
+                <div><Label>Growth Pool goal (SONA)</Label><Input type="number" value={goal} onChange={(e)=>setGoal(e.target.value)} placeholder="100000" /></div>
+                <Button type="submit" className="w-full">Create</Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        ) : null}
       </div>
+
+      {profile && !canCreate && (
+        <Card className="border-dashed bg-muted/30 p-4 text-sm">
+          <div className="flex items-start gap-3">
+            <Building2 className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
+            <div>
+              <div className="font-medium">Creating a company is for employer accounts</div>
+              <p className="mt-0.5 text-xs text-muted-foreground">Your account is set to <span className="font-semibold">{profile.user_type}</span>. Switch your account type to <span className="font-semibold">recruiter</span> or <span className="font-semibold">company</span> from your profile settings to create and manage a company page. You can still discover and support companies below.</p>
+            </div>
+          </div>
+        </Card>
+      )}
+
 
       <div className="grid gap-4 md:grid-cols-2">
         {companies.length === 0 && <Card className="col-span-full p-10 text-center text-muted-foreground">No companies yet. Be the first to create one.</Card>}
