@@ -108,19 +108,19 @@ function FeedPage() {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
+    <div className="mx-auto grid w-full max-w-[1128px] gap-6 lg:grid-cols-[225px_minmax(0,555px)_300px]">
       {/* Left: profile card */}
       <aside className="hidden lg:block">
         <Card className="overflow-hidden">
-          <div className="h-16 bg-gradient-to-br from-primary to-primary-hover" />
+          <div className="h-14 bg-gradient-to-br from-primary to-primary-hover" />
           <div className="-mt-8 flex flex-col items-center px-4 pb-4">
             <Avatar className="h-16 w-16 border-4 border-card">
               <AvatarImage src={profile?.avatar_url ?? undefined} />
               <AvatarFallback className="bg-primary text-primary-foreground">{profile ? initials(profile.full_name) : "?"}</AvatarFallback>
             </Avatar>
             <div className="mt-2 text-center">
-              <div className="font-semibold">{profile?.full_name}</div>
-              <div className="text-xs text-muted-foreground">{profile?.headline ?? "Add a headline"}</div>
+              <div className="font-semibold text-sm">{profile?.full_name}</div>
+              <div className="text-xs text-muted-foreground line-clamp-2">{profile?.headline ?? "Add a headline"}</div>
             </div>
           </div>
           <div className="border-t border-border px-4 py-3 text-xs">
@@ -131,16 +131,16 @@ function FeedPage() {
         </Card>
       </aside>
 
-      {/* Center: composer + posts */}
-      <div className="space-y-4">
-        <Card className="p-4">
-          <div className="flex gap-3">
-            <Avatar className="h-10 w-10">
+      {/* Center: composer + posts (LinkedIn-width column, max 555px) */}
+      <div className="min-w-0 space-y-2">
+        <Card className="p-3 sm:p-4">
+          <div className="flex gap-2 sm:gap-3">
+            <Avatar className="h-10 w-10 shrink-0 sm:h-12 sm:w-12">
               <AvatarImage src={profile?.avatar_url ?? undefined} />
               <AvatarFallback className="bg-primary text-primary-foreground text-sm">{profile ? initials(profile.full_name) : "?"}</AvatarFallback>
             </Avatar>
-            <div className="flex-1">
-              <Textarea value={composer} onChange={(e) => setComposer(e.target.value)} placeholder="Share an insight, experience, or update…" className="min-h-[80px] resize-none border-0 bg-muted/40 focus-visible:ring-1" />
+            <div className="min-w-0 flex-1">
+              <Textarea value={composer} onChange={(e) => setComposer(e.target.value)} placeholder="Start a post…" className="min-h-[44px] resize-none rounded-full border border-border bg-transparent px-4 py-2.5 text-sm focus-visible:ring-1" />
               <input ref={mediaInputRef} type="file" accept="image/*,video/*" hidden onChange={pickMedia} />
               {mediaPreview && (
                 <div className="relative mt-3 overflow-hidden rounded-lg border border-border bg-muted/40">
@@ -154,11 +154,11 @@ function FeedPage() {
                   </Button>
                 </div>
               )}
-              <div className="mt-2 flex items-center justify-between">
+              <div className="mt-2 flex items-center justify-between gap-2">
                 <Button type="button" variant="ghost" size="sm" className="gap-2 text-muted-foreground" onClick={() => mediaInputRef.current?.click()}>
-                  <ImagePlus className="h-4 w-4" /> Media
+                  <ImagePlus className="h-4 w-4" /> <span className="hidden xs:inline">Media</span>
                 </Button>
-                <Button onClick={publish} disabled={(!composer.trim() && !mediaFile) || posting} size="sm" className="gap-2">
+                <Button onClick={publish} disabled={(!composer.trim() && !mediaFile) || posting} size="sm" className="gap-2 rounded-full px-4">
                   {posting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} {posting ? "Posting…" : "Post"}
                 </Button>
               </div>
@@ -173,43 +173,56 @@ function FeedPage() {
         )}
 
         {posts.map((p) => (
-          <Card key={p.id} className="p-4">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10">
+          <Card key={p.id} className="overflow-hidden">
+            <div className="flex items-start gap-2 px-3 pt-3 sm:px-4 sm:pt-4">
+              <Avatar className="h-10 w-10 shrink-0 sm:h-12 sm:w-12">
                 <AvatarImage src={p.author?.avatar_url ?? undefined} />
                 <AvatarFallback className="bg-primary text-primary-foreground text-sm">{initials(p.author?.full_name ?? "U")}</AvatarFallback>
               </Avatar>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-sm">{p.author?.full_name}</span>
-                  {p.author?.verified_badge && <Badge variant="secondary" className="h-4 px-1 text-[10px]">Verified</Badge>}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="truncate text-sm font-semibold">{p.author?.full_name}</span>
+                  {p.author?.verified_badge && <Badge variant="secondary" className="h-4 shrink-0 px-1 text-[10px]">Verified</Badge>}
                 </div>
-                <div className="text-xs text-muted-foreground">{p.author?.headline ?? `@${p.author?.username}`} · {formatRelative(p.created_at)}</div>
+                <div className="truncate text-xs text-muted-foreground">{p.author?.headline ?? `@${p.author?.username}`}</div>
+                <div className="text-xs text-muted-foreground">{formatRelative(p.created_at)}</div>
               </div>
             </div>
-            <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">{p.content}</p>
+            {p.content && (
+              <p className="whitespace-pre-wrap px-3 pt-2 text-sm leading-relaxed sm:px-4">{p.content}</p>
+            )}
             {p.image_url && (
-              <div className="mt-3 overflow-hidden rounded-lg border border-border">
+              <div className="mt-3 bg-muted">
                 {isVideoMedia(p.image_url) ? (
-                  <video src={p.image_url} className="max-h-[480px] w-full object-contain" controls preload="metadata" />
+                  <video src={p.image_url} className="block max-h-[510px] w-full object-contain" controls preload="metadata" />
                 ) : (
-                  <img src={p.image_url} alt="Post media" className="max-h-[480px] w-full object-contain" loading="lazy" />
+                  <img src={p.image_url} alt="Post media" className="block max-h-[510px] w-full object-contain" loading="lazy" />
                 )}
               </div>
             )}
-            <div className="mt-3 flex items-center justify-between border-t border-border pt-2 text-sm">
-              <div className="text-xs text-muted-foreground">{p.like_count} likes · {p.comment_count} comments</div>
+            <div className="flex items-center justify-between px-3 pt-3 text-xs text-muted-foreground sm:px-4">
+              <span>{p.like_count} likes</span>
+              <span>{p.comment_count} comments</span>
             </div>
-            <div className="mt-1 grid grid-cols-3 gap-1">
-              <Button variant="ghost" size="sm" onClick={() => toggleLike(p)} className={p.liked ? "text-primary" : "text-muted-foreground"}>
-                <Heart className={`mr-2 h-4 w-4 ${p.liked ? "fill-current" : ""}`} /> Like
+            <div className="mt-1 grid grid-cols-4 gap-0 border-t border-border px-1 py-1 sm:px-2">
+              <Button variant="ghost" size="sm" onClick={() => toggleLike(p)} className={`gap-1.5 ${p.liked ? "text-primary" : "text-muted-foreground"}`}>
+                <Heart className={`h-4 w-4 ${p.liked ? "fill-current" : ""}`} /> <span className="hidden sm:inline">Like</span>
               </Button>
-              <Button variant="ghost" size="sm" className="text-muted-foreground"><MessageCircle className="mr-2 h-4 w-4" /> Comment</Button>
-              <Button variant="ghost" size="sm" className="text-muted-foreground"><Share2 className="mr-2 h-4 w-4" /> Share</Button>
+              <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground"><MessageCircle className="h-4 w-4" /> <span className="hidden sm:inline">Comment</span></Button>
+              <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground"><Share2 className="h-4 w-4" /> <span className="hidden sm:inline">Repost</span></Button>
+              <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground"><Send className="h-4 w-4" /> <span className="hidden sm:inline">Send</span></Button>
             </div>
           </Card>
         ))}
       </div>
+
+      {/* Right rail (desktop only) */}
+      <aside className="hidden lg:block">
+        <Card className="p-4">
+          <h3 className="mb-2 text-sm font-semibold">SONA Rewards</h3>
+          <p className="text-xs text-muted-foreground">Earn SONA by posting, engaging, and building reputation. Rewards accumulate and unlock at mainnet launch.</p>
+        </Card>
+      </aside>
     </div>
   );
 }
