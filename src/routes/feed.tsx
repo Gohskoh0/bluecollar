@@ -103,7 +103,6 @@ function FeedPage() {
       await supabase.from("likes").delete().match({ post_id: p.id, user_id: user.id });
     } else {
       await supabase.from("likes").insert({ post_id: p.id, user_id: user.id });
-      await supabase.from("reward_events").insert({ user_id: user.id, action: "like", weight: ACTION_WEIGHTS.like.weight, pool: ACTION_WEIGHTS.like.pool });
     }
     setPosts((prev) => prev.map((x) => x.id === p.id ? { ...x, liked: !x.liked, like_count: x.like_count + (x.liked ? -1 : 1) } : x));
   }
