@@ -29,7 +29,7 @@ function RepPage() {
   const [top, setTop] = useState<any[]>([]);
 
   useEffect(() => {
-    supabase.from("profiles").select("*").order("qes_score", { ascending: false }).limit(20).then(({ data }) => setTop(data ?? []));
+    supabase.from("profiles_public" as "profiles").select("id,username,full_name,avatar_url,qes_score,reputation_score").order("qes_score", { ascending: false }).limit(20).then(({ data }) => setTop(data ?? []));
   }, []);
 
   const score = profile?.reputation_score ?? Math.min(1000, (profile?.profile_completeness ?? 0) * 5 + (profile?.qes_score ?? 0) / 10);
