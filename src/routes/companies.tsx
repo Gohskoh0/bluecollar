@@ -142,10 +142,30 @@ function CompaniesPage() {
                   <Progress value={pct} />
                 </div>
               )}
-              <div className="mt-4 flex justify-end">
-                <Button size="sm" variant="outline" onClick={() => contribute(c.id)} className="gap-2">
-                  <Coins className="h-4 w-4" /> Pledge 100 SONA
-                </Button>
+              <div className="mt-4 flex items-center justify-between gap-2">
+                <span className="text-xs text-muted-foreground">Multiplier {((1 + Math.log10(1 + c.growth_pool_raised / 1000))).toFixed(2)}×</span>
+                <Dialog open={stakeOpen === c.id} onOpenChange={(o) => setStakeOpen(o ? c.id : null)}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" variant="outline" className="gap-2"><Coins className="h-4 w-4" /> Stake SONA</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader><DialogTitle>Stake SONA in {c.name}</DialogTitle></DialogHeader>
+                    <div className="space-y-3">
+                      <div className="rounded-md bg-muted p-3 text-sm flex items-center gap-2">
+                        <Sparkles className="h-4 w-4 text-primary" />
+                        Your balance: <span className="font-semibold">{Number(wallet?.pending_balance ?? 0).toLocaleString()} SONA</span>
+                      </div>
+                      <div>
+                        <Label>Amount (SONA)</Label>
+                        <Input type="number" min={1} value={stakeAmount} onChange={(e) => setStakeAmount(e.target.value)} />
+                      </div>
+                      <p className="text-xs text-muted-foreground">Staking grows the company's multiplier and ranking. No equity, no securities exposure. You can unstake later.</p>
+                      <Button className="w-full" onClick={() => doStake(c.id)} disabled={staking}>
+                        {staking ? "Staking…" : `Stake ${stakeAmount || 0} SONA`}
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </Card>
           );
