@@ -25,16 +25,25 @@ function CompaniesPage() {
   const { user, profile } = useAuth();
   const canCreate = !!profile && profile.user_type !== "professional";
   const [companies, setCompanies] = useState<any[]>([]);
+  const [wallet, setWallet] = useState<any>(null);
+  const [stakeOpen, setStakeOpen] = useState<string | null>(null);
+  const [stakeAmount, setStakeAmount] = useState("100");
+  const [staking, setStaking] = useState(false);
+  const stake = useServerFn(stakeInCompany);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(""); const [tagline, setTagline] = useState("");
   const [desc, setDesc] = useState(""); const [industry, setIndustry] = useState("");
   const [goal, setGoal] = useState("");
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [user?.id]);
 
   async function load() {
     const { data } = await supabase.from("companies").select("*").order("ranking_score", { ascending: false });
     setCompanies(data ?? []);
+    if (user) {
+      const { data: w } = await supabase.from("sona_wallets").select("pending_balance").eq("user_id", user.id).maybeSingle();
+      setWallet(w);
+    }
   }
 
   async function createCompany(e: React.FormEvent) {
@@ -51,13 +60,19 @@ function CompaniesPage() {
     load();
   }
 
-  async function contribute(companyId: string) {
-    if (!user) return;
-    const amount = 100; // demo Stage 1: locked SONA contribution
-    const { error } = await supabase.from("growth_contributions").insert({ company_id: companyId, user_id: user.id, amount });
-    if (error) return toast.error(error.message);
-    toast.success(`Pledged ${amount} SONA (locked, distributed at Stage 2)`);
-    load();
+  async function doStake(companyId: string) {
+    if (!user) return toast.error("Sign in first");
+    const amt = Math.floor(Number(stakeAmount));
+    if (!amt || amt <= 0) return toast.error("Enter a valid amount");
+    setStaking(true);
+    try {
+      await stake({ data: { companyId, amount: amt } });
+      toast.success(`Staked ${amt} SONA`);
+      setStakeOpen(null);
+      load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Stake failed");
+    } finally { setStaking(false); }
   }
 
   return (
