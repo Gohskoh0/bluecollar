@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Building2, Plus, ShieldCheck, TrendingUp, Coins } from "lucide-react";
+import { Building2, Plus, ShieldCheck, TrendingUp, Coins, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -13,6 +14,7 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { stakeInCompany } from "@/lib/stake.functions";
 
 export const Route = createFileRoute("/companies")({
   head: () => ({ meta: [{ title: "Companies · BlueCollar" }, { name: "description", content: "Discover and support companies on BlueCollar." }] }),
