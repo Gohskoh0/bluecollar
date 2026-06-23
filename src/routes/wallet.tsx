@@ -31,7 +31,7 @@ function WalletPage() {
   async function load() {
     if (!user) return;
     try {
-      const res = await ensure({ data: {} as any });
+      const res: any = await (ensure as any)();
       setWallet(res.wallet);
       setSolBalance(res.solBalance ?? 0);
     } catch (e) { /* ignore */ }
