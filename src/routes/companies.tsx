@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Building2, Plus, ShieldCheck, TrendingUp, Coins } from "lucide-react";
+import { Building2, Plus, ShieldCheck, TrendingUp, Coins, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -13,6 +14,7 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { stakeInCompany } from "@/lib/stake.functions";
 
 export const Route = createFileRoute("/companies")({
   head: () => ({ meta: [{ title: "Companies · BlueCollar" }, { name: "description", content: "Discover and support companies on BlueCollar." }] }),
@@ -23,16 +25,25 @@ function CompaniesPage() {
   const { user, profile } = useAuth();
   const canCreate = !!profile && profile.user_type !== "professional";
   const [companies, setCompanies] = useState<any[]>([]);
+  const [wallet, setWallet] = useState<any>(null);
+  const [stakeOpen, setStakeOpen] = useState<string | null>(null);
+  const [stakeAmount, setStakeAmount] = useState("100");
+  const [staking, setStaking] = useState(false);
+  const stake = useServerFn(stakeInCompany);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(""); const [tagline, setTagline] = useState("");
   const [desc, setDesc] = useState(""); const [industry, setIndustry] = useState("");
   const [goal, setGoal] = useState("");
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [user?.id]);
 
   async function load() {
     const { data } = await supabase.from("companies").select("*").order("ranking_score", { ascending: false });
     setCompanies(data ?? []);
+    if (user) {
+      const { data: w } = await supabase.from("sona_wallets").select("pending_balance").eq("user_id", user.id).maybeSingle();
+      setWallet(w);
+    }
   }
 
   async function createCompany(e: React.FormEvent) {
@@ -49,13 +60,19 @@ function CompaniesPage() {
     load();
   }
 
-  async function contribute(companyId: string) {
-    if (!user) return;
-    const amount = 100; // demo Stage 1: locked SONA contribution
-    const { error } = await supabase.from("growth_contributions").insert({ company_id: companyId, user_id: user.id, amount });
-    if (error) return toast.error(error.message);
-    toast.success(`Pledged ${amount} SONA (locked, distributed at Stage 2)`);
-    load();
+  async function doStake(companyId: string) {
+    if (!user) return toast.error("Sign in first");
+    const amt = Math.floor(Number(stakeAmount));
+    if (!amt || amt <= 0) return toast.error("Enter a valid amount");
+    setStaking(true);
+    try {
+      await stake({ data: { companyId, amount: amt } });
+      toast.success(`Staked ${amt} SONA`);
+      setStakeOpen(null);
+      load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Stake failed");
+    } finally { setStaking(false); }
   }
 
   return (
@@ -125,10 +142,30 @@ function CompaniesPage() {
                   <Progress value={pct} />
                 </div>
               )}
-              <div className="mt-4 flex justify-end">
-                <Button size="sm" variant="outline" onClick={() => contribute(c.id)} className="gap-2">
-                  <Coins className="h-4 w-4" /> Pledge 100 SONA
-                </Button>
+              <div className="mt-4 flex items-center justify-between gap-2">
+                <span className="text-xs text-muted-foreground">Multiplier {((1 + Math.log10(1 + c.growth_pool_raised / 1000))).toFixed(2)}×</span>
+                <Dialog open={stakeOpen === c.id} onOpenChange={(o) => setStakeOpen(o ? c.id : null)}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" variant="outline" className="gap-2"><Coins className="h-4 w-4" /> Stake SONA</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader><DialogTitle>Stake SONA in {c.name}</DialogTitle></DialogHeader>
+                    <div className="space-y-3">
+                      <div className="rounded-md bg-muted p-3 text-sm flex items-center gap-2">
+                        <Sparkles className="h-4 w-4 text-primary" />
+                        Your balance: <span className="font-semibold">{Number(wallet?.pending_balance ?? 0).toLocaleString()} SONA</span>
+                      </div>
+                      <div>
+                        <Label>Amount (SONA)</Label>
+                        <Input type="number" min={1} value={stakeAmount} onChange={(e) => setStakeAmount(e.target.value)} />
+                      </div>
+                      <p className="text-xs text-muted-foreground">Staking grows the company's multiplier and ranking. No equity, no securities exposure. You can unstake later.</p>
+                      <Button className="w-full" onClick={() => doStake(c.id)} disabled={staking}>
+                        {staking ? "Staking…" : `Stake ${stakeAmount || 0} SONA`}
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </Card>
           );

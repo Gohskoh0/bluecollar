@@ -187,6 +187,55 @@ export type Database = {
           },
         ]
       }
+      company_stakes: {
+        Row: {
+          amount: number
+          company_id: string
+          created_at: string
+          id: string
+          unstaked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          company_id: string
+          created_at?: string
+          id?: string
+          unstaked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          company_id?: string
+          created_at?: string
+          id?: string
+          unstaked_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_stakes_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_stakes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_stakes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       follows: {
         Row: {
           created_at: string
@@ -793,12 +842,20 @@ export type Database = {
       }
     }
     Functions: {
+      company_sona_multiplier: {
+        Args: { p_company_id: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      stake_company_sona: {
+        Args: { p_amount: number; p_company_id: string }
+        Returns: string
       }
     }
     Enums: {
