@@ -1,5 +1,6 @@
+import { useEffect, useState } from "react";
 import { Link, useRouter } from "@tanstack/react-router";
-import { Bell, Briefcase, Building2, Coins, Home, LogOut, Search, User as UserIcon, Trophy, Star } from "lucide-react";
+import { Bell, Briefcase, Building2, Coins, Home, LogOut, Search, User as UserIcon, Trophy, Star, Users, MessagesSquare } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,19 +13,43 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { initials } from "@/lib/utils";
 import { useAuth, type Profile } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/bluecollar-logo.png";
 
 const NAV = [
   { to: "/feed", icon: Home, label: "Home" },
+  { to: "/network", icon: Users, label: "Network" },
   { to: "/jobs", icon: Briefcase, label: "Jobs" },
+  { to: "/messages", icon: MessagesSquare, label: "Messaging" },
+  { to: "/notifications", icon: Bell, label: "Notifications" },
   { to: "/companies", icon: Building2, label: "Companies" },
   { to: "/wallet", icon: Coins, label: "SONA" },
   { to: "/reputation", icon: Trophy, label: "Reputation" },
 ];
 
 export function Navbar({ profile }: { profile: Profile | null }) {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const router = useRouter();
+  const [unreadNotifs, setUnreadNotifs] = useState(0);
+  const [unreadMsgs, setUnreadMsgs] = useState(0);
+
+  useEffect(() => {
+    if (!user) { setUnreadNotifs(0); setUnreadMsgs(0); return; }
+    const refresh = async () => {
+      const [{ count: n }, { count: m }] = await Promise.all([
+        supabase.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", user.id).is("read_at", null),
+        supabase.from("messages").select("id", { count: "exact", head: true }).eq("recipient_id", user.id).is("read_at", null),
+      ]);
+      setUnreadNotifs(n ?? 0);
+      setUnreadMsgs(m ?? 0);
+    };
+    refresh();
+    const ch = supabase.channel(`navbar-${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` }, refresh)
+      .on("postgres_changes", { event: "*", schema: "public", table: "messages", filter: `recipient_id=eq.${user.id}` }, refresh)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [user?.id]);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
@@ -37,20 +62,25 @@ export function Navbar({ profile }: { profile: Profile | null }) {
           <Input placeholder="Search professionals, jobs, companies" className="h-9 pl-9 bg-muted/60 border-0" />
         </div>
         <nav className="ml-auto flex items-center gap-1">
-          {NAV.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className="group flex flex-col items-center gap-0.5 rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground data-[status=active]:text-primary"
-              activeProps={{ "data-status": "active" } as any}
-            >
-              <item.icon className="h-5 w-5" />
-              <span className="hidden lg:inline">{item.label}</span>
-            </Link>
-          ))}
-          <button className="rounded-md p-2 text-muted-foreground hover:text-foreground" aria-label="Notifications">
-            <Bell className="h-5 w-5" />
-          </button>
+          {NAV.map((item) => {
+            const badge = item.to === "/notifications" ? unreadNotifs : item.to === "/messages" ? unreadMsgs : 0;
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="group relative flex flex-col items-center gap-0.5 rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground data-[status=active]:text-primary"
+                activeProps={{ "data-status": "active" } as any}
+              >
+                <item.icon className="h-5 w-5" />
+                {badge > 0 && (
+                  <span className="absolute right-1 top-0.5 min-w-[16px] rounded-full bg-destructive px-1 text-[10px] font-bold leading-4 text-destructive-foreground">
+                    {badge > 99 ? "99+" : badge}
+                  </span>
+                )}
+                <span className="hidden lg:inline">{item.label}</span>
+              </Link>
+            );
+          })}
           <DropdownMenu>
             <DropdownMenuTrigger className="ml-1 outline-none">
               <Avatar className="h-8 w-8 border border-border">

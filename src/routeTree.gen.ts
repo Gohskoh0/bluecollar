@@ -12,6 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as SubscriptionsRouteImport } from './routes/subscriptions'
 import { Route as ReputationRouteImport } from './routes/reputation'
+import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as NetworkRouteImport } from './routes/network'
+import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as CompaniesRouteImport } from './routes/companies'
@@ -33,6 +36,21 @@ const SubscriptionsRoute = SubscriptionsRouteImport.update({
 const ReputationRoute = ReputationRouteImport.update({
   id: '/reputation',
   path: '/reputation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NetworkRoute = NetworkRouteImport.update({
+  id: '/network',
+  path: '/network',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MessagesRoute = MessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JobsRoute = JobsRouteImport.update({
@@ -78,6 +96,9 @@ export interface FileRoutesByFullPath {
   '/companies': typeof CompaniesRoute
   '/feed': typeof FeedRoute
   '/jobs': typeof JobsRoute
+  '/messages': typeof MessagesRoute
+  '/network': typeof NetworkRoute
+  '/notifications': typeof NotificationsRoute
   '/reputation': typeof ReputationRoute
   '/subscriptions': typeof SubscriptionsRoute
   '/wallet': typeof WalletRoute
@@ -90,6 +111,9 @@ export interface FileRoutesByTo {
   '/companies': typeof CompaniesRoute
   '/feed': typeof FeedRoute
   '/jobs': typeof JobsRoute
+  '/messages': typeof MessagesRoute
+  '/network': typeof NetworkRoute
+  '/notifications': typeof NotificationsRoute
   '/reputation': typeof ReputationRoute
   '/subscriptions': typeof SubscriptionsRoute
   '/wallet': typeof WalletRoute
@@ -103,6 +127,9 @@ export interface FileRoutesById {
   '/companies': typeof CompaniesRoute
   '/feed': typeof FeedRoute
   '/jobs': typeof JobsRoute
+  '/messages': typeof MessagesRoute
+  '/network': typeof NetworkRoute
+  '/notifications': typeof NotificationsRoute
   '/reputation': typeof ReputationRoute
   '/subscriptions': typeof SubscriptionsRoute
   '/wallet': typeof WalletRoute
@@ -117,6 +144,9 @@ export interface FileRouteTypes {
     | '/companies'
     | '/feed'
     | '/jobs'
+    | '/messages'
+    | '/network'
+    | '/notifications'
     | '/reputation'
     | '/subscriptions'
     | '/wallet'
@@ -129,6 +159,9 @@ export interface FileRouteTypes {
     | '/companies'
     | '/feed'
     | '/jobs'
+    | '/messages'
+    | '/network'
+    | '/notifications'
     | '/reputation'
     | '/subscriptions'
     | '/wallet'
@@ -141,6 +174,9 @@ export interface FileRouteTypes {
     | '/companies'
     | '/feed'
     | '/jobs'
+    | '/messages'
+    | '/network'
+    | '/notifications'
     | '/reputation'
     | '/subscriptions'
     | '/wallet'
@@ -154,6 +190,9 @@ export interface RootRouteChildren {
   CompaniesRoute: typeof CompaniesRoute
   FeedRoute: typeof FeedRoute
   JobsRoute: typeof JobsRoute
+  MessagesRoute: typeof MessagesRoute
+  NetworkRoute: typeof NetworkRoute
+  NotificationsRoute: typeof NotificationsRoute
   ReputationRoute: typeof ReputationRoute
   SubscriptionsRoute: typeof SubscriptionsRoute
   WalletRoute: typeof WalletRoute
@@ -182,6 +221,27 @@ declare module '@tanstack/react-router' {
       path: '/reputation'
       fullPath: '/reputation'
       preLoaderRoute: typeof ReputationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/network': {
+      id: '/network'
+      path: '/network'
+      fullPath: '/network'
+      preLoaderRoute: typeof NetworkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/messages': {
+      id: '/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof MessagesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/jobs': {
@@ -242,6 +302,9 @@ const rootRouteChildren: RootRouteChildren = {
   CompaniesRoute: CompaniesRoute,
   FeedRoute: FeedRoute,
   JobsRoute: JobsRoute,
+  MessagesRoute: MessagesRoute,
+  NetworkRoute: NetworkRoute,
+  NotificationsRoute: NotificationsRoute,
   ReputationRoute: ReputationRoute,
   SubscriptionsRoute: SubscriptionsRoute,
   WalletRoute: WalletRoute,

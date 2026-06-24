@@ -107,6 +107,16 @@ function FeedPage() {
     setPosts((prev) => prev.map((x) => x.id === p.id ? { ...x, liked: !x.liked, like_count: x.like_count + (x.liked ? -1 : 1) } : x));
   }
 
+  async function repost(p: PostRow) {
+    if (!user) return;
+    const { error } = await supabase.from("reposts").insert({ post_id: p.id, user_id: user.id });
+    if (error) {
+      if (error.code === "23505") return toast.info("You already reposted this");
+      return toast.error(error.message);
+    }
+    toast.success("Reposted to your network");
+  }
+
   return (
     <div className="mx-auto grid w-full max-w-[1128px] gap-6 lg:grid-cols-[225px_minmax(0,555px)_300px]">
       {/* Left: profile card */}
@@ -209,7 +219,7 @@ function FeedPage() {
                 <Heart className={`h-4 w-4 ${p.liked ? "fill-current" : ""}`} /> <span className="hidden sm:inline">Like</span>
               </Button>
               <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground"><MessageCircle className="h-4 w-4" /> <span className="hidden sm:inline">Comment</span></Button>
-              <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground"><Share2 className="h-4 w-4" /> <span className="hidden sm:inline">Repost</span></Button>
+              <Button variant="ghost" size="sm" onClick={() => repost(p)} className="gap-1.5 text-muted-foreground"><Share2 className="h-4 w-4" /> <span className="hidden sm:inline">Repost</span></Button>
               <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground"><Send className="h-4 w-4" /> <span className="hidden sm:inline">Send</span></Button>
             </div>
           </Card>
