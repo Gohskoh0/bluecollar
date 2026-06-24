@@ -236,6 +236,33 @@ export type Database = {
           },
         ]
       }
+      connections: {
+        Row: {
+          addressee_id: string
+          created_at: string
+          id: string
+          requester_id: string
+          status: Database["public"]["Enums"]["connection_status"]
+          updated_at: string
+        }
+        Insert: {
+          addressee_id: string
+          created_at?: string
+          id?: string
+          requester_id: string
+          status?: Database["public"]["Enums"]["connection_status"]
+          updated_at?: string
+        }
+        Update: {
+          addressee_id?: string
+          created_at?: string
+          id?: string
+          requester_id?: string
+          status?: Database["public"]["Enums"]["connection_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       follows: {
         Row: {
           created_at: string
@@ -448,6 +475,69 @@ export type Database = {
           },
         ]
       }
+      messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          read_at: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          kind: string
+          payload: Json
+          read_at: string | null
+          user_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          kind: string
+          payload?: Json
+          read_at?: string | null
+          user_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          kind?: string
+          payload?: Json
+          read_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       paystack_transactions: {
         Row: {
           amount_kobo: number
@@ -610,6 +700,38 @@ export type Database = {
         }
         Relationships: []
       }
+      reposts: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reposts_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reward_events: {
         Row: {
           action: string
@@ -651,6 +773,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      skill_endorsements: {
+        Row: {
+          created_at: string
+          endorser_id: string
+          id: string
+          profile_id: string
+          skill: string
+        }
+        Insert: {
+          created_at?: string
+          endorser_id: string
+          id?: string
+          profile_id: string
+          skill: string
+        }
+        Update: {
+          created_at?: string
+          endorser_id?: string
+          id?: string
+          profile_id?: string
+          skill?: string
+        }
+        Relationships: []
       }
       sona_wallets: {
         Row: {
@@ -846,6 +992,17 @@ export type Database = {
         Args: { p_company_id: string }
         Returns: number
       }
+      create_notification: {
+        Args: {
+          p_actor_id: string
+          p_entity_id: string
+          p_entity_type: string
+          p_kind: string
+          p_payload?: Json
+          p_user_id: string
+        }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -866,6 +1023,7 @@ export type Database = {
         | "interview"
         | "hired"
         | "rejected"
+      connection_status: "pending" | "accepted" | "declined"
       job_type: "full_time" | "part_time" | "contract" | "internship" | "remote"
       subscription_plan:
         | "free"
@@ -1009,6 +1167,7 @@ export const Constants = {
         "hired",
         "rejected",
       ],
+      connection_status: ["pending", "accepted", "declined"],
       job_type: ["full_time", "part_time", "contract", "internship", "remote"],
       subscription_plan: [
         "free",
