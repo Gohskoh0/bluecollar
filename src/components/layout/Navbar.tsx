@@ -1,5 +1,6 @@
+import { useEffect, useState } from "react";
 import { Link, useRouter } from "@tanstack/react-router";
-import { Bell, Briefcase, Building2, Coins, Home, LogOut, Search, User as UserIcon, Trophy, Star } from "lucide-react";
+import { Bell, Briefcase, Building2, Coins, Home, LogOut, Search, User as UserIcon, Trophy, Star, Users, MessagesSquare } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,11 +13,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { initials } from "@/lib/utils";
 import { useAuth, type Profile } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/bluecollar-logo.png";
 
 const NAV = [
   { to: "/feed", icon: Home, label: "Home" },
+  { to: "/network", icon: Users, label: "Network" },
   { to: "/jobs", icon: Briefcase, label: "Jobs" },
+  { to: "/messages", icon: MessagesSquare, label: "Messaging" },
+  { to: "/notifications", icon: Bell, label: "Notifications" },
   { to: "/companies", icon: Building2, label: "Companies" },
   { to: "/wallet", icon: Coins, label: "SONA" },
   { to: "/reputation", icon: Trophy, label: "Reputation" },
