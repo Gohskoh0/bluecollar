@@ -223,6 +223,7 @@ function Landing() {
           <div className="flex items-center gap-2">
             <img src={logo} alt="" className="h-6 w-6" />
             <span>© {new Date().getFullYear()} Sonari</span>
+            <span className="text-xs">· Powered by AuvincT</span>
           </div>
           <div className="text-xs">Stage 1 — SONA token launch coming in Stage 2 via community airdrop.</div>
         </div>
