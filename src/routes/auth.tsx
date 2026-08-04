@@ -183,6 +183,7 @@ function AuthPage() {
         <p className="mt-4 text-center text-xs text-muted-foreground">
           By continuing you agree to Sonari's terms and confirm you have read the platform documentation.
         </p>
+        <p className="mt-2 text-center text-xs text-muted-foreground">Powered by AuvincT</p>
       </div>
     </div>
   );
