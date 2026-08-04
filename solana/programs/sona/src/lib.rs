@@ -6,7 +6,7 @@ use anchor_spl::{
 
 declare_id!("Ex9Jg3YVNSJhWN2thNbxn2nFvUNATj7czyNR44VTHYHc");
 
-/// BlueCollar SONA token program.
+/// Sonari SONA token program.
 ///
 /// Stage 1: airdrop registry and pending balance ledger only.
 /// Stage 2: distributes SONA from the treasury to user claim accounts based on the
