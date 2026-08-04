@@ -11,7 +11,7 @@ import { formatRelative, initials } from "@/lib/utils";
 import { resolveProfileMedia } from "@/lib/storage-media";
 
 export const Route = createFileRoute("/notifications")({
-  head: () => ({ meta: [{ title: "Notifications · BlueCollar" }] }),
+  head: () => ({ meta: [{ title: "Notifications · Sonari" }] }),
   component: () => (<AppShell><NotificationsPage /></AppShell>),
 });
 

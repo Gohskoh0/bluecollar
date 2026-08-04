@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { initials } from "@/lib/utils";
 
 export const Route = createFileRoute("/reputation")({
-  head: () => ({ meta: [{ title: "Reputation · BlueCollar" }, { name: "description", content: "Your Professional Reputation Score and the global leaderboard." }] }),
+  head: () => ({ meta: [{ title: "Reputation · Sonari" }, { name: "description", content: "Your Professional Reputation Score and the global leaderboard." }] }),
   component: () => (<AppShell><RepPage/></AppShell>),
 });
 

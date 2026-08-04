@@ -14,7 +14,7 @@ import {
 import { initials } from "@/lib/utils";
 import { useAuth, type Profile } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import logo from "@/assets/bluecollar-logo.png";
+import logo from "@/assets/sonari-logo.png";
 
 const NAV = [
   { to: "/feed", icon: Home, label: "Home" },
@@ -55,7 +55,7 @@ export function Navbar({ profile }: { profile: Profile | null }) {
     <header className="sticky top-0 z-40 w-full border-b border-border bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4">
         <Link to="/feed" className="flex shrink-0 items-center gap-2">
-          <img src={logo} alt="BlueCollar" className="h-8 w-8" width={32} height={32} />
+          <img src={logo} alt="Sonari" className="h-8 w-8" width={32} height={32} />
         </Link>
         <div className="relative hidden flex-1 max-w-xs md:block">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

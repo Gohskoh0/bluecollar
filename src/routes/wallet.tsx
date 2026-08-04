@@ -14,7 +14,7 @@ import { ensureWallet } from "@/lib/wallet.functions";
 import { formatRelative } from "@/lib/utils";
 
 export const Route = createFileRoute("/wallet")({
-  head: () => ({ meta: [{ title: "SONA Wallet · BlueCollar" }, { name: "description", content: "Your SONA wallet — balance, rewards, and staking." }] }),
+  head: () => ({ meta: [{ title: "SONA Wallet · Sonari" }, { name: "description", content: "Your SONA wallet — balance, rewards, and staking." }] }),
   component: () => (<AppShell><WalletPage /></AppShell>),
 });
 

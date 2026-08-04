@@ -14,7 +14,7 @@ import { ACTION_WEIGHTS, formatRelative, initials } from "@/lib/utils";
 import { isVideoMedia, resolvePostMedia, resolveProfileMedia, toStorageRef } from "@/lib/storage-media";
 
 export const Route = createFileRoute("/feed")({
-  head: () => ({ meta: [{ title: "Feed · BlueCollar" }, { name: "description", content: "Your professional feed on BlueCollar." }] }),
+  head: () => ({ meta: [{ title: "Feed · Sonari" }, { name: "description", content: "Your professional feed on Sonari." }] }),
   component: () => (<AppShell><FeedPage /></AppShell>),
 });
 

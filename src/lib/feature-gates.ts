@@ -1,5 +1,5 @@
 // Feature gating tied to user_type (professional / recruiter / company) and plan.
-// Mirrors the BlueCollar documentation: each user type has a specific feature set.
+// Mirrors the Sonari documentation: each user type has a specific feature set.
 
 import type { Profile } from "@/hooks/useAuth";
 
