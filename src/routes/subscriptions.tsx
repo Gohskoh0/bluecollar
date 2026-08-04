@@ -12,7 +12,7 @@ import { getPaystackPublicKey, initializePaystack, verifyPaystack } from "@/lib/
 import { PLAN_PRICE_NGN, PLAN_LABEL } from "@/lib/feature-gates";
 
 export const Route = createFileRoute("/subscriptions")({
-  head: () => ({ meta: [{ title: "Subscriptions · BlueCollar" }, { name: "description", content: "Choose a BlueCollar plan and unlock monetization." }] }),
+  head: () => ({ meta: [{ title: "Subscriptions · Sonari" }, { name: "description", content: "Choose a Sonari plan and unlock monetization." }] }),
   component: () => (<AppShell><SubsPage /></AppShell>),
 });
 

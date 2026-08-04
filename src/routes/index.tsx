@@ -3,18 +3,18 @@ import { useEffect } from "react";
 import { ArrowRight, Briefcase, Building2, Coins, ShieldCheck, TrendingUp, Trophy, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import logo from "@/assets/bluecollar-logo.png";
+import logo from "@/assets/sonari-logo.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "BlueCollar — The Professional Economy Network" },
+      { title: "Sonari — The Professional Economy Network" },
       {
         name: "description",
         content:
           "Professional networking, jobs, and a revenue-backed reward economy. Build your career and earn from real platform revenue with SONA.",
       },
-      { property: "og:title", content: "BlueCollar — The Professional Economy Network" },
+      { property: "og:title", content: "Sonari — The Professional Economy Network" },
       {
         property: "og:description",
         content:
@@ -48,8 +48,8 @@ function Landing() {
       <header className="border-b border-border bg-surface/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="BlueCollar" className="h-9 w-9" width={36} height={36} />
-            <span className="text-lg font-bold tracking-tight text-foreground">BlueCollar</span>
+            <img src={logo} alt="Sonari" className="h-9 w-9" width={36} height={36} />
+            <span className="text-lg font-bold tracking-tight text-foreground">Sonari</span>
           </div>
           <div className="flex items-center gap-2">
             <Link to="/auth">
@@ -74,7 +74,7 @@ function Landing() {
               The Professional <span className="text-primary">Economy Network</span>
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-              BlueCollar combines professional networking, a job marketplace, and a revenue-backed
+              Sonari combines professional networking, a job marketplace, and a revenue-backed
               reward economy. Where your contribution builds real, measurable value.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
@@ -135,7 +135,7 @@ function Landing() {
           Four layers. One economy.
         </h2>
         <p className="mx-auto mt-3 max-w-2xl text-center text-muted-foreground">
-          BlueCollar redistributes platform revenue back to the professionals who create the value.
+          Sonari redistributes platform revenue back to the professionals who create the value.
         </p>
         <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {[
@@ -222,7 +222,7 @@ function Landing() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-muted-foreground md:flex-row">
           <div className="flex items-center gap-2">
             <img src={logo} alt="" className="h-6 w-6" />
-            <span>© {new Date().getFullYear()} BlueCollar</span>
+            <span>© {new Date().getFullYear()} Sonari</span>
           </div>
           <div className="text-xs">Stage 1 — SONA token launch coming in Stage 2 via community airdrop.</div>
         </div>

@@ -1,4 +1,4 @@
-# BlueCollar SONA Token — Solana Devnet
+# Sonari SONA Token — Solana Devnet
 
 This directory contains the Anchor program that backs the SONA token economy.
 

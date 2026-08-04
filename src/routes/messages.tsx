@@ -13,7 +13,7 @@ import { formatRelative, initials } from "@/lib/utils";
 import { resolveProfileMedia } from "@/lib/storage-media";
 
 export const Route = createFileRoute("/messages")({
-  head: () => ({ meta: [{ title: "Messages · BlueCollar" }] }),
+  head: () => ({ meta: [{ title: "Messages · Sonari" }] }),
   component: () => (<AppShell><MessagesPage /></AppShell>),
 });
 

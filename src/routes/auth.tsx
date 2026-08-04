@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
-import logo from "@/assets/bluecollar-logo.png";
+import logo from "@/assets/sonari-logo.png";
 
 const searchSchema = z.object({ mode: z.enum(["signin", "signup"]).optional() });
 
@@ -21,8 +21,8 @@ export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Sign in · BlueCollar" },
-      { name: "description", content: "Sign in or create an account to join BlueCollar — the professional economy network." },
+      { title: "Sign in · Sonari" },
+      { name: "description", content: "Sign in or create an account to join Sonari — the professional economy network." },
     ],
   }),
   component: AuthPage,
@@ -59,7 +59,7 @@ function AuthPage() {
     });
     setLoading(false);
     if (error) return toast.error(error.message);
-    toast.success("Check your email to verify your BlueCollar account.");
+    toast.success("Check your email to verify your Sonari account.");
     setTab("signin");
   }
 
@@ -111,8 +111,8 @@ function AuthPage() {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-accent via-background to-background px-4 py-10">
       <div className="w-full max-w-md">
         <div className="mb-6 text-center">
-          <img src={logo} alt="BlueCollar" className="mx-auto h-12 w-12" width={48} height={48} />
-          <h1 className="mt-3 text-2xl font-bold">Welcome to BlueCollar</h1>
+          <img src={logo} alt="Sonari" className="mx-auto h-12 w-12" width={48} height={48} />
+          <h1 className="mt-3 text-2xl font-bold">Welcome to Sonari</h1>
           <p className="mt-1 text-sm text-muted-foreground">The Professional Economy Network</p>
         </div>
         <div className="rounded-xl border border-border bg-card p-6 shadow-elevated">
@@ -174,14 +174,14 @@ function AuthPage() {
                   <p className="mt-1 text-xs text-muted-foreground">At least 6 characters.</p>
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Creating account…" : "Join BlueCollar"}
+                  {loading ? "Creating account…" : "Join Sonari"}
                 </Button>
               </form>
             </TabsContent>
           </Tabs>
         </div>
         <p className="mt-4 text-center text-xs text-muted-foreground">
-          By continuing you agree to BlueCollar's terms and confirm you have read the platform documentation.
+          By continuing you agree to Sonari's terms and confirm you have read the platform documentation.
         </p>
       </div>
     </div>

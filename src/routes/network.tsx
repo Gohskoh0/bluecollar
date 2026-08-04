@@ -13,7 +13,7 @@ import { initials } from "@/lib/utils";
 import { resolveProfileMedia } from "@/lib/storage-media";
 
 export const Route = createFileRoute("/network")({
-  head: () => ({ meta: [{ title: "My Network · BlueCollar" }] }),
+  head: () => ({ meta: [{ title: "My Network · Sonari" }] }),
   component: () => (<AppShell><NetworkPage /></AppShell>),
 });
 

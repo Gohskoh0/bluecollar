@@ -22,7 +22,7 @@ import { getFeatures, PLAN_LABEL } from "@/lib/feature-gates";
 import { isVideoMedia, resolvePostMedia, resolveProfileMedia } from "@/lib/storage-media";
 
 export const Route = createFileRoute("/profile/$username")({
-  head: ({ params }) => ({ meta: [{ title: `@${params.username} · BlueCollar` }, { name: "description", content: `Profile of @${params.username} on BlueCollar.` }] }),
+  head: ({ params }) => ({ meta: [{ title: `@${params.username} · Sonari` }, { name: "description", content: `Profile of @${params.username} on Sonari.` }] }),
   component: () => (<AppShell><ProfilePage/></AppShell>),
 });
 

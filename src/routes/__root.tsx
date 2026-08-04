@@ -78,14 +78,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "BlueCollar — The Professional Economy Network" },
+      { title: "Sonari — The Professional Economy Network" },
       {
         name: "description",
         content:
           "Professional networking, jobs, and a revenue-backed reward economy powered by SONA. Where your contribution builds real value.",
       },
-      { name: "author", content: "BlueCollar" },
-      { property: "og:title", content: "BlueCollar — The Professional Economy Network" },
+      { name: "author", content: "Sonari" },
+      { property: "og:title", content: "Sonari — The Professional Economy Network" },
       {
         property: "og:description",
         content:

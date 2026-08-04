@@ -17,7 +17,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { stakeInCompany } from "@/lib/stake.functions";
 
 export const Route = createFileRoute("/companies")({
-  head: () => ({ meta: [{ title: "Companies · BlueCollar" }, { name: "description", content: "Discover and support companies on BlueCollar." }] }),
+  head: () => ({ meta: [{ title: "Companies · Sonari" }, { name: "description", content: "Discover and support companies on Sonari." }] }),
   component: () => (<AppShell><CompaniesPage /></AppShell>),
 });
 

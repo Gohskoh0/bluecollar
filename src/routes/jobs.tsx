@@ -16,7 +16,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ACTION_WEIGHTS, formatRelative } from "@/lib/utils";
 
 export const Route = createFileRoute("/jobs")({
-  head: () => ({ meta: [{ title: "Jobs · BlueCollar" }, { name: "description", content: "Browse and post jobs on the BlueCollar marketplace." }] }),
+  head: () => ({ meta: [{ title: "Jobs · Sonari" }, { name: "description", content: "Browse and post jobs on the Sonari marketplace." }] }),
   component: () => (<AppShell><JobsPage /></AppShell>),
 });
 
@@ -71,7 +71,7 @@ function JobsPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">Job Marketplace</h1>
-          <p className="text-sm text-muted-foreground">Verified roles from recruiters and companies on BlueCollar.</p>
+          <p className="text-sm text-muted-foreground">Verified roles from recruiters and companies on Sonari.</p>
         </div>
         {(profile?.user_type === "recruiter" || profile?.user_type === "company") && (
           <Dialog open={open} onOpenChange={setOpen}>
