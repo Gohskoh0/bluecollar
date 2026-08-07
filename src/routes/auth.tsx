@@ -130,15 +130,20 @@ function AuthPage() {
 
   async function handleGoogle() {
     setLoading(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        setLoading(false);
+        return toast.error(result.error.message || "Google sign-in failed");
+      }
+      if (result.redirected) return;
+      navigate({ to: "/feed" });
+    } catch (err) {
       setLoading(false);
-      return toast.error(result.error.message || "Google sign-in failed");
+      toast.error(describeError(err));
     }
-    if (result.redirected) return;
-    navigate({ to: "/feed" });
   }
 
   return (
