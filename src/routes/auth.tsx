@@ -46,53 +46,87 @@ function AuthPage() {
     });
   }, [navigate]);
 
+  function describeError(err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (/failed to fetch|networkerror|load failed|network request failed/i.test(msg)) {
+      return "Can't reach the Sonari servers. Check your connection (or disable any ad/tracker blocker) and try again.";
+    }
+    return msg;
+  }
+
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: getAuthRedirectUrl(),
-        data: { full_name: fullName, user_type: userType },
-      },
-    });
-    setLoading(false);
-    if (error) return toast.error(error.message);
-    toast.success("Check your email to verify your Sonari account.");
-    setTab("signin");
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          emailRedirectTo: getAuthRedirectUrl(),
+          data: { full_name: fullName, user_type: userType },
+        },
+      });
+      if (error) {
+        if (/invalid/i.test(error.message) && /email/i.test(error.message)) {
+          return toast.error("That email address isn't accepted. Please use a real email address.");
+        }
+        if (/already registered|already exists|user already/i.test(error.message)) {
+          setTab("signin");
+          return toast.error("An account with this email already exists — sign in instead.");
+        }
+        return toast.error(error.message);
+      }
+      // Session present = account is active immediately, no verification needed.
+      if (data.session) {
+        toast.success("Welcome to Sonari!");
+        navigate({ to: "/feed" });
+        return;
+      }
+      toast.success("Check your email to verify your Sonari account.");
+      setTab("signin");
+    } catch (err) {
+      toast.error(describeError(err));
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleSignIn(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) {
-      const msg = error.message.toLowerCase();
-      if (msg.includes("email not confirmed") || msg.includes("not confirmed")) {
-        return toast.error("Please verify your email first.", {
-          action: {
-            label: "Resend",
-            onClick: async () => {
-              const { error: rErr } = await supabase.auth.resend({
-                type: "signup",
-                email,
-                options: { emailRedirectTo: getAuthRedirectUrl() },
-              });
-              if (rErr) toast.error(rErr.message);
-              else toast.success("Verification email sent.");
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      if (error) {
+        const msg = error.message.toLowerCase();
+        if (msg.includes("email not confirmed") || msg.includes("not confirmed")) {
+          return toast.error("Please verify your email first.", {
+            action: {
+              label: "Resend",
+              onClick: async () => {
+                const { error: rErr } = await supabase.auth.resend({
+                  type: "signup",
+                  email: email.trim(),
+                  options: { emailRedirectTo: getAuthRedirectUrl() },
+                });
+                if (rErr) toast.error(rErr.message);
+                else toast.success("Verification email sent.");
+              },
             },
-          },
-        });
+          });
+        }
+        if (msg.includes("invalid login") || msg.includes("invalid credentials")) {
+          return toast.error("Incorrect email or password.");
+        }
+        return toast.error(error.message);
       }
-      if (msg.includes("invalid login") || msg.includes("invalid credentials")) {
-        return toast.error("Incorrect email or password.");
-      }
-      return toast.error(error.message);
+      navigate({ to: "/feed" });
+    } catch (err) {
+      toast.error(describeError(err));
+    } finally {
+      setLoading(false);
     }
-    navigate({ to: "/feed" });
   }
+
 
   async function handleGoogle() {
     setLoading(true);
