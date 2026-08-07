@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
+
 import logo from "@/assets/sonari-logo.png";
 
 const searchSchema = z.object({ mode: z.enum(["signin", "signup"]).optional() });
@@ -124,25 +124,6 @@ function AuthPage() {
       toast.error(describeError(err));
     } finally {
       setLoading(false);
-    }
-  }
-
-
-  async function handleGoogle() {
-    setLoading(true);
-    try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
-      });
-      if (result.error) {
-        setLoading(false);
-        return toast.error(result.error.message || "Google sign-in failed");
-      }
-      if (result.redirected) return;
-      navigate({ to: "/feed" });
-    } catch (err) {
-      setLoading(false);
-      toast.error(describeError(err));
     }
   }
 
