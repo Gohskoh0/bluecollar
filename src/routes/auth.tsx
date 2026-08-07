@@ -142,14 +142,7 @@ function AuthPage() {
               <TabsTrigger value="signup">Create account</TabsTrigger>
             </TabsList>
 
-            <div className="mt-5">
-              <Button type="button" variant="outline" className="w-full" onClick={handleGoogle} disabled={loading}>
-                Continue with Google
-              </Button>
-              <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
-                <div className="h-px flex-1 bg-border" /> or <div className="h-px flex-1 bg-border" />
-              </div>
-            </div>
+
 
             <TabsContent value="signin" className="mt-0">
               <form onSubmit={handleSignIn} className="space-y-4">
