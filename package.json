@@ -72,10 +72,14 @@
     "zod": "^3.24.2"
   },
   "overrides": {
-    "rpc-websockets": "7.11.0"
+    "rpc-websockets": "7.11.0",
+    "seroval": "^1.6.2",
+    "seroval-plugins": "^1.6.2"
   },
   "resolutions": {
-    "rpc-websockets": "7.11.0"
+    "rpc-websockets": "7.11.0",
+    "seroval": "^1.6.2",
+    "seroval-plugins": "^1.6.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
