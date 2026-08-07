@@ -142,9 +142,8 @@ function AuthPage() {
               <TabsTrigger value="signup">Create account</TabsTrigger>
             </TabsList>
 
+            <TabsContent value="signin" className="mt-5">
 
-
-            <TabsContent value="signin" className="mt-0">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div>
                   <Label htmlFor="si-email">Email</Label>
