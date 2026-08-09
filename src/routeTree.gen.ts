@@ -21,6 +21,7 @@ import { Route as CompaniesRouteImport } from './routes/companies'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProfileUsernameRouteImport } from './routes/profile.$username'
+import { Route as CompanySlugRouteImport } from './routes/company.$slug'
 import { Route as ApiPublicPaystackWebhookRouteImport } from './routes/api/public/paystack-webhook'
 
 const WalletRoute = WalletRouteImport.update({
@@ -83,6 +84,11 @@ const ProfileUsernameRoute = ProfileUsernameRouteImport.update({
   path: '/profile/$username',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompanySlugRoute = CompanySlugRouteImport.update({
+  id: '/company/$slug',
+  path: '/company/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPaystackWebhookRoute =
   ApiPublicPaystackWebhookRouteImport.update({
     id: '/api/public/paystack-webhook',
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/reputation': typeof ReputationRoute
   '/subscriptions': typeof SubscriptionsRoute
   '/wallet': typeof WalletRoute
+  '/company/$slug': typeof CompanySlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
   '/api/public/paystack-webhook': typeof ApiPublicPaystackWebhookRoute
 }
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/reputation': typeof ReputationRoute
   '/subscriptions': typeof SubscriptionsRoute
   '/wallet': typeof WalletRoute
+  '/company/$slug': typeof CompanySlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
   '/api/public/paystack-webhook': typeof ApiPublicPaystackWebhookRoute
 }
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   '/reputation': typeof ReputationRoute
   '/subscriptions': typeof SubscriptionsRoute
   '/wallet': typeof WalletRoute
+  '/company/$slug': typeof CompanySlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
   '/api/public/paystack-webhook': typeof ApiPublicPaystackWebhookRoute
 }
@@ -150,6 +159,7 @@ export interface FileRouteTypes {
     | '/reputation'
     | '/subscriptions'
     | '/wallet'
+    | '/company/$slug'
     | '/profile/$username'
     | '/api/public/paystack-webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -165,6 +175,7 @@ export interface FileRouteTypes {
     | '/reputation'
     | '/subscriptions'
     | '/wallet'
+    | '/company/$slug'
     | '/profile/$username'
     | '/api/public/paystack-webhook'
   id:
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
     | '/reputation'
     | '/subscriptions'
     | '/wallet'
+    | '/company/$slug'
     | '/profile/$username'
     | '/api/public/paystack-webhook'
   fileRoutesById: FileRoutesById
@@ -196,6 +208,7 @@ export interface RootRouteChildren {
   ReputationRoute: typeof ReputationRoute
   SubscriptionsRoute: typeof SubscriptionsRoute
   WalletRoute: typeof WalletRoute
+  CompanySlugRoute: typeof CompanySlugRoute
   ProfileUsernameRoute: typeof ProfileUsernameRoute
   ApiPublicPaystackWebhookRoute: typeof ApiPublicPaystackWebhookRoute
 }
@@ -286,6 +299,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileUsernameRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/company/$slug': {
+      id: '/company/$slug'
+      path: '/company/$slug'
+      fullPath: '/company/$slug'
+      preLoaderRoute: typeof CompanySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/paystack-webhook': {
       id: '/api/public/paystack-webhook'
       path: '/api/public/paystack-webhook'
@@ -308,6 +328,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReputationRoute: ReputationRoute,
   SubscriptionsRoute: SubscriptionsRoute,
   WalletRoute: WalletRoute,
+  CompanySlugRoute: CompanySlugRoute,
   ProfileUsernameRoute: ProfileUsernameRoute,
   ApiPublicPaystackWebhookRoute: ApiPublicPaystackWebhookRoute,
 }

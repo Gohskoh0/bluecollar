@@ -18,7 +18,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { initials } from "@/lib/utils";
 import { PhotoUploader } from "@/components/profile/AvatarUploader";
 import { MonetizationTab } from "@/components/profile/MonetizationTab";
-import { getFeatures, PLAN_LABEL } from "@/lib/feature-gates";
+import { PLAN_LABEL, USER_TYPE_LABEL } from "@/lib/feature-gates";
 import { isVideoMedia, resolvePostMedia, resolveProfileMedia } from "@/lib/storage-media";
 
 export const Route = createFileRoute("/profile/$username")({
@@ -70,7 +70,6 @@ function ProfilePage() {
 
   if (!p) return <Card className="p-10 text-center text-muted-foreground">Profile not found.</Card>;
   const isOwn = user?.id === p.id;
-  const features = getFeatures(p);
 
   return (
     <div className="space-y-4">
@@ -120,8 +119,8 @@ function ProfilePage() {
           <div className="mt-3">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-2xl font-bold">{p.full_name}</h1>
-              {(p.verified_badge || features.verifiedBadge) && <Badge className="gap-1"><ShieldCheck className="h-3 w-3"/>Verified</Badge>}
-              <Badge variant="outline" className="capitalize">{p.user_type}</Badge>
+              {p.verified_badge && <Badge className="gap-1"><ShieldCheck className="h-3 w-3"/>Verified</Badge>}
+              <Badge variant="outline">{USER_TYPE_LABEL[p.user_type as keyof typeof USER_TYPE_LABEL]}</Badge>
               <Badge variant="secondary">{PLAN_LABEL[p.plan as keyof typeof PLAN_LABEL] ?? p.plan}</Badge>
             </div>
             <p className="text-sm text-muted-foreground">{p.headline ?? "—"}</p>

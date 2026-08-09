@@ -125,6 +125,7 @@ export type Database = {
           ranking_score: number
           size_range: string | null
           slug: string
+          sona_treasury: number
           tagline: string | null
           updated_at: string
           verified: boolean
@@ -145,6 +146,7 @@ export type Database = {
           ranking_score?: number
           size_range?: string | null
           slug: string
+          sona_treasury?: number
           tagline?: string | null
           updated_at?: string
           verified?: boolean
@@ -165,6 +167,7 @@ export type Database = {
           ranking_score?: number
           size_range?: string | null
           slug?: string
+          sona_treasury?: number
           tagline?: string | null
           updated_at?: string
           verified?: boolean
@@ -181,6 +184,168 @@ export type Database = {
           {
             foreignKeyName: "companies_owner_id_fkey"
             columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_licenses: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          started_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_licenses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_licenses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_members: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          role: string
+          salary_sona: number
+          status: string
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          role?: string
+          salary_sona?: number
+          status?: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+          salary_sona?: number
+          status?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_members_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_payments: {
+        Row: {
+          amount: number
+          company_id: string
+          created_at: string
+          id: string
+          member_id: string | null
+          note: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          company_id: string
+          created_at?: string
+          id?: string
+          member_id?: string | null
+          note?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          company_id?: string
+          created_at?: string
+          id?: string
+          member_id?: string | null
+          note?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_payments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_payments_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "company_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_payments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_payments_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles_public"
             referencedColumns: ["id"]
@@ -385,6 +550,54 @@ export type Database = {
           },
         ]
       }
+      hash_rate_purchases: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          currency: string
+          ghs: number
+          id: string
+          pack_id: string
+          reference: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          currency?: string
+          ghs: number
+          id?: string
+          pack_id: string
+          reference?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          ghs?: number
+          id?: string
+          pack_id?: string
+          reference?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hash_rate_purchases_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hash_rate_purchases_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       jobs: {
         Row: {
           application_count: number
@@ -560,6 +773,45 @@ export type Database = {
           },
         ]
       }
+      mining_claims: {
+        Row: {
+          amount: number
+          created_at: string
+          hash_rate: number
+          id: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          hash_rate: number
+          id?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          hash_rate?: number
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mining_claims_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mining_claims_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           actor_id: string | null
@@ -724,9 +976,11 @@ export type Database = {
           follower_count: number
           following_count: number
           full_name: string
+          hash_rate: number
           headline: string | null
           id: string
           kyc_verified: boolean
+          last_mining_claim_at: string | null
           location: string | null
           plan: Database["public"]["Enums"]["subscription_plan"]
           profile_completeness: number
@@ -747,9 +1001,11 @@ export type Database = {
           follower_count?: number
           following_count?: number
           full_name: string
+          hash_rate?: number
           headline?: string | null
           id: string
           kyc_verified?: boolean
+          last_mining_claim_at?: string | null
           location?: string | null
           plan?: Database["public"]["Enums"]["subscription_plan"]
           profile_completeness?: number
@@ -770,9 +1026,11 @@ export type Database = {
           follower_count?: number
           following_count?: number
           full_name?: string
+          hash_rate?: number
           headline?: string | null
           id?: string
           kyc_verified?: boolean
+          last_mining_claim_at?: string | null
           location?: string | null
           plan?: Database["public"]["Enums"]["subscription_plan"]
           profile_completeness?: number
@@ -1075,10 +1333,12 @@ export type Database = {
       }
     }
     Functions: {
+      claim_mining_yield: { Args: never; Returns: number }
       company_sona_multiplier: {
         Args: { p_company_id: string }
         Returns: number
       }
+      company_worth: { Args: { p_company_id: string }; Returns: number }
       create_notification: {
         Args: {
           p_actor_id: string
@@ -1090,12 +1350,30 @@ export type Database = {
         }
         Returns: string
       }
+      fund_company_treasury: {
+        Args: { p_amount: number; p_company_id: string }
+        Returns: number
+      }
+      has_company_license: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      is_company_admin: {
+        Args: { _company_id: string; _user_id: string }
+        Returns: boolean
+      }
+      pay_employee_sona: {
+        Args: {
+          p_amount: number
+          p_company_id: string
+          p_member_id: string
+          p_note?: string
+        }
+        Returns: string
       }
       stake_company_sona: {
         Args: { p_amount: number; p_company_id: string }
