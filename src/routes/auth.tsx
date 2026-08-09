@@ -36,7 +36,7 @@ function AuthPage() {
 
   // signup state
   const [fullName, setFullName] = useState("");
-  const [userType, setUserType] = useState<"professional" | "recruiter" | "company">("professional");
+  const [userType, setUserType] = useState<"professional" | "recruiter">("professional");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -170,11 +170,13 @@ function AuthPage() {
                   <Select value={userType} onValueChange={(v) => setUserType(v as any)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="professional">Professional (creator / job seeker)</SelectItem>
+                      <SelectItem value="professional">Freelancer / Job seeker</SelectItem>
                       <SelectItem value="recruiter">Recruiter</SelectItem>
-                      <SelectItem value="company">Company</SelectItem>
                     </SelectContent>
                   </Select>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Either account type can register a company later with a company licence.
+                  </p>
                 </div>
                 <div>
                   <Label htmlFor="su-email">Email</Label>
