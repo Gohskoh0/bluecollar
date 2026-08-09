@@ -10,29 +10,17 @@ export const Route = createFileRoute("/api/public/paystack-webhook")({
         const signature = request.headers.get("x-paystack-signature") ?? "";
         const body = await request.text();
         const expected = createHmac("sha512", secret).update(body).digest("hex");
-        const a = Buffer.from(signature); const b = Buffer.from(expected);
+        const a = Buffer.from(signature);
+        const b = Buffer.from(expected);
         if (a.length !== b.length || !timingSafeEqual(a, b)) {
           return new Response("Invalid signature", { status: 401 });
         }
         const event = JSON.parse(body);
         if (event.event === "charge.success") {
           const reference = event.data?.reference;
-          if (!reference) return new Response("ok");
-          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-          const { data: txn } = await supabaseAdmin
-            .from("paystack_transactions")
-            .select("*")
-            .eq("reference", reference)
-            .maybeSingle();
-          if (txn && txn.status !== "success") {
-            const planTyped = txn.plan as "pro" | "expert" | "recruiter_pro" | "recruiter_expert";
-            await supabaseAdmin.from("paystack_transactions").update({
-              status: "success",
-              paid_at: new Date().toISOString(),
-              raw: event.data,
-            }).eq("id", txn.id);
-            await supabaseAdmin.from("profiles").update({ plan: planTyped }).eq("id", txn.user_id);
-            await supabaseAdmin.from("subscriptions").insert({ user_id: txn.user_id, plan: planTyped, status: "active" });
+          if (reference) {
+            const { fulfillPurchase } = await import("@/lib/fulfillment.server");
+            await fulfillPurchase(reference, event.data);
           }
         }
         return new Response("ok");
